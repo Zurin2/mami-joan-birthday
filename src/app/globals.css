@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* 60% base → 30% structural → 10% accent (warm pink/gold/cream) */
+  --color-cream: #fff8f0;
+  --color-blush: #ffe9f0;
+  --color-rose: #f49fbc;
+  --color-raspberry: #e26a8d;
+  --color-gold: #e9b94f;
+  --color-goldsoft: #f7d98b;
+  --color-cocoa: #5c4033;
+  --color-cocoasoft: #8a6a5c;
+
+  --font-script: var(--font-dancing), cursive;
+  --font-hand: var(--font-caveat), cursive;
+  --font-body: var(--font-nunito), sans-serif;
+}
+
+html {
+  overflow-x: clip;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-cocoa);
+}
+
+/* Warm paper texture for note surfaces (pure CSS, no asset) */
+.paper {
+  background:
+    repeating-linear-gradient(
+      transparent 0 31px,
+      rgba(92, 64, 51, 0.08) 31px 32px
+    ),
+    linear-gradient(160deg, #fffdf7, #fdf3e3);
+}
+
+::selection {
+  background: var(--color-rose);
+  color: #fff;
+}
+
+/* Balloons (z-0) sit under main (z-10): make main's empty areas tap-through so
+   balloon buttons are reachable; interactive elements re-enable themselves. */
+main {
+  pointer-events: none;
+}
+main :is(a, button, [role="button"], input, select, textarea) {
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Page 1 polish additions (appended; existing rules untouched) ---------- */
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Animated rose→raspberry→gold gradient for display text (plain text nodes only —
+   never combine with per-letter transformed spans; Chrome breaks bg-clip there). */
+.title-gradient {
+  /* Pad the background box beyond the glyph ink (script swashes overflow the
+     line box); negative margins keep the layout identical. Without this, the
+     overhanging ink has no background under it and looks cut off. */
+  padding-left: 0.18em;
+  padding-right: 0.18em;
+  margin-left: -0.18em;
+  margin-right: -0.18em;
+  background-image: linear-gradient(
+    105deg,
+    #e26a8d 0%,
+    #d4537a 32%,
+    #e9b94f 68%,
+    #f7d98b 100%
+  );
+  background-size: 200% 200%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 7s ease-in-out infinite alternate;
+}
+
+/* Gold shimmer for the "tap the seal" hint */
+.shimmer-text {
+  padding-left: 0.12em;
+  padding-right: 0.12em;
+  margin-left: -0.12em;
+  margin-right: -0.12em;
+  background-image: linear-gradient(
+    100deg,
+    #b98a4e 0%,
+    #e9b94f 42%,
+    #f7d98b 55%,
+    #b98a4e 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-shift 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.75;
+    transform: scale(1.15);
+  }
+}
+
+/* Tiny ambient sparkle dot (size/position/timing set inline via --dur/--delay) */
+.sparkle-dot {
+  position: absolute;
+  border-radius: 9999px;
+  background: radial-gradient(circle at 35% 35%, #fff, #e9b94f 70%);
+  opacity: 0.45;
+  animation: twinkle var(--dur, 5s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+  pointer-events: none;
+}
+
+@keyframes seal-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.55);
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* Expanding gold ring rippling from the wax seal */
+.seal-ripple {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 96px;
+  height: 96px;
+  border: 1.5px solid rgba(233, 185, 79, 0.65);
+  border-radius: 9999px;
+  opacity: 0; /* invisible if the animation is disabled (reduced motion) */
+  animation: seal-ripple 2.5s ease-out infinite;
+  pointer-events: none;
+}
